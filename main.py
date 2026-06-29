@@ -5,6 +5,7 @@ from database import students_collection,client
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from typing import List,Optional
+from fastapi.staticfiles import StaticFiles
 
 #--------------------------------------------------------------
 #----------VARIABLES-------------------------------------------
@@ -12,8 +13,10 @@ from typing import List,Optional
 app=FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
+# browser sends to GET /static/style.css but FastAPI doesn't know static so, to let it understand it, we mount the css file in main.py
+# This is like telling FastAPI:
+# Whenever someone asks for something starting with /static, don't look in my routes. Instead, go inside my static folder.
 
 
 #--------------------------------------------------------------
