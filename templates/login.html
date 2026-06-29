@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Login/Signup</h2>
+<br /> <hr>
+    <h3>Login</h3>
+    {% if message %}
+    <p style="color:red;">{{ message }}</p>
+    {% endif %}
+    <form action="/student-login" method="post">
+        <label>Email address</label>
+        <input type="email"name="email"required>
+        
+        <br />
+        
+        <label>Password</label>
+        <input type="password"name="password"required>
+        
+        <br />
+        
+        <label>Role:</label>
+        <input type="radio" id="admin" name="role" value="Admin">
+        <label for="admin">Admin</label>
+        <input type="radio" id="student" name="role" value="Student" >
+        <label for="student">Student</label>
+        
+        <br />
+        
+        <button id="submitBtn"type="submit">Log In As Student</button>
+
+    </form>
+    <br /><br /><hr>
+    <a href="/reset-password"method="get">
+        <button type="submit">Forgotten password?</button>
+    </a>
+    
+    <a href="/signup-student"method="get">
+        <button type="submit">Sign Up</button>
+    </a>
+    
+    
+<script>
+if (window.location.search.includes("error=1")) {
+    window.history.replaceState({}, "", "/login");
+}
+
+const button = document.getElementById("submitBtn");
+document.querySelectorAll('input[name="role"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+        button.textContent = `Log In As ${radio.value}`;
+    });
+});
+</script>
+</body>
+</html>

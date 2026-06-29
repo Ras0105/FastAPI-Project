@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>University Management System</h1>
+    <h2>Add Student</h2>
+    <form action="/create-student" method="post"> 
+        <!-- doubt how html page finds /create-stuent -->
+
+        <label>Name:</label><br>
+        <input type="text" name="name" required>
+        <br><br>
+
+        <label>Age:</label><br>
+        <input type="number" name="age" required>
+        <br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" required>
+        <br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required>
+        <br><br>
+
+        <label>Admin or Student:</label><br>
+        <input type="radio" id="admin" name="role" value="Admin">
+        <label for="admin">Admin</label>
+        <br>
+        <input type="radio" id="student" name="role" value="Student">
+        <label for="student">Student</label>
+        <br><br>
+        <button type="submit" id="submitBtn">
+            Add Student
+        </button>
+    </form>
+
+
+<script>
+const button = document.getElementById("submitBtn");
+document.querySelectorAll('input[name="role"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+        button.textContent = `Add ${radio.value}`;
+    });
+});
+</script>    
+</body>
+</html>
