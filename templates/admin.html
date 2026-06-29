@@ -7,8 +7,103 @@
 </head>
 <body>
     <h1>This Is Admin Page</h1>
-    <h2>Display All Students</h2>
-    <a href="/read-student">  <button type="submit">Show Students</button></a>
+    <!-- <a href="/read-student">  <button type="submit">Show Students</button></a> -->
+
+    <hr>
     
+    <h2>Display All Students</h2>
+    <button onclick="showStudents()"id="showBtn">
+        Show Students
+    </button>
+
+    <br><br>
+    <div id="read"style="display:none;">
+
+
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Role</th>
+            
+        </tr>
+
+        {% for student in students %}
+            {%if student.role=="Student"%}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.age }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.role }}</td>
+        </tr>
+            {% endif %}
+        {% endfor %}
+
+    </table>
+    </div>
+
+
+    <div>
+        <h2>Deletion</h2>
+        <hr>
+        <!-- <a href="/delete-page">
+            <button>Delete Students</button>
+        </a> -->
+        <h2>Delete All Students</h2>
+        
+        {% if message %}
+        <p style="color:red;">{{ message }}</p>
+        {% endif %}
+        <form action="/delete-all" method="post">
+            <input type="text" name="confirm"placeholder="Type DELETE to confirm:"">
+            <button type="submit">Delete All Students</button>
+        </form>
+
+        <hr>
+
+        <h2>Delete Selected Students</h2>
+
+        <form action="/delete-some" method="post">
+
+        {% for student in students %}
+            {%if student.role=="Student"%}
+            <input
+                type="checkbox"
+                name="emails"
+                value="{{ student.email }}"
+            >
+            <label>{{ student.email }}</label>
+            <br>
+            {% endif %}
+        {% endfor %}
+
+        <br>
+
+        <button type="submit">
+            Delete Selected
+        </button>
+
+        </form>
+
+
+
+
+
+    </div>
+<script>
+function showStudents() {
+    let table = document.getElementById("read");
+    let btn = document.getElementById("showBtn");
+
+    if (table.style.display === "none") {
+        table.style.display = "block";
+        btn.innerText = "Hide Students";
+    } else {
+        table.style.display = "none";
+        btn.innerText = "Show Students";
+    }
+}
+</script>
 </body>
 </html>

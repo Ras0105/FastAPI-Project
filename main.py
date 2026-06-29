@@ -1,10 +1,10 @@
 #----------IMPORTS---------------------------------------------
 #--------------------------------------------------------------
 from fastapi import FastAPI,Request,Form
-from database import students_collection
+from database import students_collection,client
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-
+from typing import List,Optional
 
 #--------------------------------------------------------------
 #----------VARIABLES-------------------------------------------
@@ -106,12 +106,16 @@ def home(req: Request):
 #----------Admin Page-------------------------------------------
 #--------------------------------------------------------------
 @app.get("/admin-page")
-def home(req: Request):
+def admin_page(req: Request):
+    students = list(students_collection.find().sort("_id", -1))
     return templates.TemplateResponse(
         request=req,
-        name="admin.html"
+        name="admin.html",
+        context={
+            "request": req,
+            "students": students
+        }
     )
-
 
 #--------------------------------------------------------------
 #----------127.0.0.1:8000/signup-student-----------------------
@@ -194,14 +198,6 @@ def update_password(
     }
 )
 
-
-@app.get("/admin-panel")
-def reset_password(req:Request):
-    return templates.TemplateResponse(
-        request=req,
-        name="admin.html"
-    )
-
 #--------------------------------------------------------------
 #----------127.0.0.1:8000/read-student-------------------------
 #--------------------------------------------------------------
@@ -222,8 +218,86 @@ def read_student(req: Request):
 
 
 
+#--------------------------------------------------------------
+#----------127.0.0.1:8000/delete-all-------------------------
+#--------------------------------------------------------------
+@app.post("/delete-all")
+def delete_all(req: Request,confirm: str = Form(...)):
+    confirm=confirm.upper()
+    if confirm=="DELETE":
+        students_collection.delete_many({"role": "Student"})
+        return RedirectResponse(
+            url="/admin-page",
+            status_code=303
+        )
+
+    students = list(students_collection.find().sort("_id", -1))
+
+    return templates.TemplateResponse(
+        request=req,
+        name="admin.html",
+        context={
+            "request": req,
+            "students": students,
+            "message": "Type DELETE to confirm."
+        }
+    )
+#------------------------------------------------------------
+#----------127.0.0.1:8000/delete-some------------------------
+#------------------------------------------------------------
+from typing import List, Optional
+
+@app.post("/delete-some")
+def delete_some(
+    req: Request,
+    emails: Optional[List[str]] = Form(None)
+):
+    if not emails:
+
+        students = list(students_collection.find().sort("_id", -1))
+
+        return templates.TemplateResponse(
+            request=req,
+            name="admin.html",
+            context={
+                "request": req,
+                "students": students,
+                "message": "Please select at least one student."
+            }
+        )
+
+    students_collection.delete_many({
+        "role": "Student",
+        "email": {
+            "$in": emails
+        }
+    })
+
+    return RedirectResponse(
+        url="/admin-page",
+        status_code=303
+    )
 
 
+
+@app.get("/delete-page")
+def delete_page(req: Request):
+
+    students = list(
+        students_collection.find(
+            {"role": "Student"},
+            {"_id": 0, "email": 1}
+        )
+    )
+
+    return templates.TemplateResponse(
+        request=req,
+        name="delete.html",
+        context={
+            "request": req,
+            "students": students
+        }
+    )
 
 
 
