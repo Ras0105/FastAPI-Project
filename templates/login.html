@@ -3,47 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
     <title>Document</title>
 </head>
-<body>
-    <h2>Login/Signup</h2>
-<br /> <hr>
+<body><div class="container">
+    <h2>Login / Signup</h2>
+    <hr>
     <h3>Login</h3>
     {% if message %}
-    <p style="color:red;">{{ message }}</p>
+    <p class="error">{{ message }}</p>
     {% endif %}
     <form action="/student-login" method="post">
         <label>Email address</label>
         <input type="email"name="email"required>
         
-        <br />
-        
         <label>Password</label>
         <input type="password"name="password"required>
         
-        <br />
-        
-        <label>Role:</label>
-        <input type="radio" id="admin" name="role" value="Admin">
-        <label for="admin">Admin</label>
-        <input type="radio" id="student" name="role" value="Student" >
-        <label for="student">Student</label>
-        
-        <br />
+        <label>Role</label>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="role" value="Admin" required>
+                Admin
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="role" value="Student">
+                Student
+            </label>
+        </div>
         
         <button id="submitBtn"type="submit">Log In As Student</button>
 
     </form>
-    <br /><br /><hr>
-    <a href="/reset-password"method="get">
-        <button type="submit">Forgotten password?</button>
-    </a>
-    
-    <a href="/signup-student"method="get">
-        <button type="submit">Sign Up</button>
-    </a>
-    
-    
+    <hr>
+    <div class="bottom-buttons">
+
+        <a href="/reset-password">
+            <button type="button">
+                Forgotten Password?
+            </button>
+        </a>
+
+        <a href="/signup-student">
+            <button type="button">
+                Sign Up
+            </button>
+        </a>
+
+    </div>
+</div>
+
 <script>
 if (window.location.search.includes("error=1")) {
     window.history.replaceState({}, "", "/login");

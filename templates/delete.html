@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+<h2>Delete All Students</h2>
+
+<a href="/delete-all">
+    <button type="button">Delete All</button>
+</a>
+
+<hr>
+
+<h2>Delete Selected Students</h2>
+
+<form action="/delete-some" method="post">
+
+{% for student in students %}
+
+    <input
+        type="checkbox"
+        name="emails"
+        value="{{ student.email }}"
+    >
+
+    <label>{{ student.email }}</label>
+
+    <br>
+
+{% endfor %}
+
+<br>
+
+<button type="submit">
+    Delete Selected
+</button>
+
+</form>
+</div>
+</body>
+</html>

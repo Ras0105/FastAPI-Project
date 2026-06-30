@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
     <title>Document</title>
 </head>
 <body>
+<div class="container">
     <h1>University Management System</h1>
     <h2>Add Student</h2>
     <form action="/create-student" method="post"> 
@@ -27,6 +29,26 @@
         <input type="password" name="password" required>
         <br><br>
 
+        <label>Course:</label><br>
+        <input type="text" name="course">
+        <br><br>
+
+        <label>Branch:</label><br>
+        <input type="text" name="branch">
+        <br><br>
+        
+        <label>City:</label><br>
+        <input type="text" name="city">
+        <br><br>
+        
+        <label>Semester:</label><br>
+        <input type="number" name="semester">
+        <br><br>
+
+        <label>Status:</label><br>
+        <input type="text" name="status">
+        <br><br>
+
         <label>Admin or Student:</label><br>
         <input type="radio" id="admin" name="role" value="Admin">
         <label for="admin">Admin</label>
@@ -38,7 +60,7 @@
             Add Student
         </button>
     </form>
-
+</div>
 
 <script>
 const button = document.getElementById("submitBtn");
