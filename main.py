@@ -139,7 +139,12 @@ def create_student(
     name: str = Form(...),
     age: int = Form(...),
     email: str = Form(...),
-    password: str = Form(...),
+    password: str = Form(...), #required
+    course: Optional[str] = Form(None), #not required
+    branch: Optional[str] = Form(None),
+    city: Optional[str] = Form(None),
+    semester: Optional[int] = Form(None),
+    status: Optional[str] = Form(None),
     role: str = Form(...)
 ):
     student = {
@@ -147,6 +152,11 @@ def create_student(
         "age": age,
         "email": email,
         "password":password,
+        "course":course,
+        "branch":branch,
+        "city":city,
+        "semester":semester,
+        "status":status,
         "role":role
     }
 
@@ -225,9 +235,9 @@ def read_student(req: Request):
 #----------127.0.0.1:8000/delete-all-------------------------
 #--------------------------------------------------------------
 @app.post("/delete-all")
-def delete_all(req: Request,confirm: str = Form(...)):
-    confirm=confirm.upper()
-    if confirm=="DELETE":
+def delete_all(req: Request,confirm: Optional[str] = Form(None)):
+    # confirm=confirm.upper()
+    if confirm=="DeLeTe":
         students_collection.delete_many({"role": "Student"})
         return RedirectResponse(
             url="/admin-page",
@@ -242,7 +252,7 @@ def delete_all(req: Request,confirm: str = Form(...)):
         context={
             "request": req,
             "students": students,
-            "message": "Type DELETE to confirm."
+            "message_delete_all": "Type DeLeTe to confirm."
         }
     )
 #------------------------------------------------------------
@@ -265,7 +275,7 @@ def delete_some(
             context={
                 "request": req,
                 "students": students,
-                "message": "Please select at least one student."
+                "message_delete_some": "Please select at least one student."
             }
         )
 
@@ -281,61 +291,232 @@ def delete_some(
         status_code=303
     )
 
+#------------------------------------------------------------
+#----------127.0.0.1:8000/delete-page------------------------
+#------------------------------------------------------------
+# @app.get("/delete-page")
+# def delete_page(req: Request):
+#     students = list(
+#         students_collection.find(
+#             {"role": "Student"},
+#             {"_id": 0, "email": 1}
+#         )
+#     )
+#     return templates.TemplateResponse(
+#         request=req,
+#         name="delete.html",
+#         context={
+#             "request": req,
+#             "students": students
+#         }
+#     )
 
 
-@app.get("/delete-page")
-def delete_page(req: Request):
 
-    students = list(
-        students_collection.find(
-            {"role": "Student"},
-            {"_id": 0, "email": 1}
-        )
-    )
+
+
+
+
+#------------------------------------------------------------
+#----------127.0.0.1:8000/update-all------------------------
+#------------------------------------------------------------
+@app.post("/update-all")
+def update_all(
+    req: Request,
+    field: str = Form(...),
+    value: str = Form(...)
+):
+    allowed_fields = [
+        "name",
+        "age",
+        "course",
+        "branch",
+        "semester",
+        "city",
+        "status"
+    ]
+
+    if field not in allowed_fields:
+        return {"message_field": "Invalid field selected."}
+    
+    if field in ["age", "semester"]:
+        value = int(value)
+    
+    filter_query = {}
+    new_values = {
+        "$set": {field:value}
+    }
+    # {{$set:{"semester":3}}
+    result = students_collection.update_many(filter_query, new_values)
+    students = list(students_collection.find().sort("_id", -1))
 
     return templates.TemplateResponse(
         request=req,
-        name="delete.html",
+        name="admin.html",
         context={
             "request": req,
-            "students": students
+            "students": students,
+            "message_update_all": "Students updated successfully.",
+            "matched_all": result.matched_count,
+            "modified_all": result.modified_count
         }
     )
 
 
 
 
+#------------------------------------------------------------
+#----------127.0.0.1:8000/update-some------------------------
+#------------------------------------------------------------
+@app.post("/update-some")
+def update_some(
+    req: Request,
+    emails: Optional[List[str]] = Form(None),
+    field: str = Form(...),
+    value: str = Form(...)
+):
+    allowed_fields = [
+        "name",
+        "age",
+        "course",
+        "branch",
+        "semester",
+        "city",
+        "status"
+    ]
+    if field not in allowed_fields:
+        return {"message": "Invalid field selected."}
+    if field in ["age", "semester"]:
+        value = int(value)
+    if not emails:
+        students = list(students_collection.find().sort("_id", -1))
+        return templates.TemplateResponse(
+            request=req,
+            name="admin.html",
+            context={
+                "request": req,
+                "students": students,
+                "message_update_some": "Please select at least one student."
+            }
+        )
+    result = students_collection.update_many(
+        {"email": {"$in": emails}},{
+            "$set": {
+                field: value}})
+    students = list(students_collection.find().sort("_id", -1))
+    return templates.TemplateResponse(
+        request=req,
+        name="admin.html",
+        context={
+            "request": req,
+            "students": students,
+            "message_update_some": "Students updated successfully.",
+            "matched_some": result.matched_count,
+            "modified_some": result.modified_count
+        }
+    )
+
+#------------------------------------------------------------
+#----------127.0.0.1:8000/update-one------------------------
+#------------------------------------------------------------
+@app.post("/update-one")
+def update_one(
+    req: Request,
+    emails: Optional[List[str]] = Form(None),
+    field: str = Form(...),
+    value: str = Form(...)
+):
+    allowed_fields = [
+        "name",
+        "age",
+        "course",
+        "branch",
+        "semester",
+        "city",
+        "status"
+    ]
+    if field not in allowed_fields:
+        return {"message": "Invalid field selected."}
+    if field in ["age", "semester"]:
+        value = int(value)
+    if not emails:
+        students = list(students_collection.find().sort("_id", -1))
+        return templates.TemplateResponse(
+            request=req,
+            name="admin.html",
+            context={
+                "request": req,
+                "students": students,
+                "message_update_one": "Please select at least one student."
+            }
+        )
+    result = students_collection.update_many(
+        {"email": {"$in": emails}},{
+            "$set": {
+                field: value}})
+    students = list(students_collection.find().sort("_id", -1))
+    return templates.TemplateResponse(
+        request=req,
+        name="admin.html",
+        context={
+            "request": req,
+            "students": students,
+            "message_update_one": "Students updated successfully.",
+            "matched_one": result.matched_count,
+            "modified_one": result.modified_count
+        }
+    )
 
 
 
+# #------------------------------------------------------------
+# #----------127.0.0.1:8000/update-one------------------------
+# #------------------------------------------------------------
+# @app.post("/update-one")
+# def update_one_student(
+#     req: Request,
+#     field: str = Form(...),
+#     value: str = Form(...)
+# ):
+#     allowed_fields = [
+#         "name",
+#         "age",
+#         "course",
+#         "branch",
+#         "semester",
+#         "city",
+#         "status"
+#     ]
 
+#     if field not in allowed_fields:
+#         return {"message_field": "Invalid field selected."}
+    
+#     if field in ["age", "semester"]:
+#         value = int(value)
+    
+#     filter_query = {}
+#     new_values = {
+#         "$set": {field:value}
+#     }
+#     result = students_collection.update_one(filter_query, new_values)
+#     students = list(students_collection.find().sort("_id", -1))
 
-
-
-
-# @app.post("/update-student")
-# def update_student():
-#     # filter_query = {
-#     #     "email": "rasshi@gmail.com"
-#     # }
-#     # new_values = {
-#     #     "$set": {
-#     #         "name": "Rasshi Srivastav",
-#     #         "age": 21
-#     #     }
-#     # }
-#     # result = students_collection.update_one(filter_query, new_values)
-#     result = students_collection.update_one(
-#     {"email": "rasshi@gmail.com"},
-#     {"$set": {"age": 21}}
+#     return templates.TemplateResponse(
+#         request=req,
+#         name="admin.html",
+#         context={
+#             "request": req,
+#             "students": students,
+#             "message_update": "Students updated successfully.",
+#             "matched": result.matched_count,
+#             "modified": result.modified_count
+#         }
 #     )
-#     if result.matched_count == 0:
-#         return {"message": "Student not found"}
 
-#     if result.modified_count == 0:
-#         return {"message": "Student already has these values"}
+#------------------------------------------------------------
+#----------127.0.0.1:8000/update-one------------------------
+#------------------------------------------------------------
 
-#     return {"message": "Student updated successfully"}
 
 
 # @app.post("/delete-student")

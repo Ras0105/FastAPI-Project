@@ -1,107 +1,332 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/style.css">
-    <title>Document</title>
+    <title>Admin Page</title>
 </head>
+
 <body>
+
 <div class="container">
+
     <h1>This Is Admin Page</h1>
-    <!-- <a href="/read-student">  <button type="submit">Show Students</button></a> -->
 
     <hr>
-    
-    <h2>Display All Students</h2>
-    <button onclick="showStudents()"id="showBtn">
-        Show Students
-    </button>
 
-    <br><br>
-    <div id="read"style="display:none;">
+    <!-- ===================== READ SECTION ===================== -->
 
+    <div id="read">
 
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Email</th>
-            <th>Role</th>
-            
-        </tr>
+        <h2>Display All Students</h2>
+        <div class="bottom-buttons">
+            <button onclick="showAllDetails()">All Details</button>
+            <button onclick="showSomeDetails()">Some Details</button>
+        </div>
+        <br><br>
 
-        {% for student in students %}
-            {%if student.role=="Student"%}
-        <tr>
-            <td>{{ student.name }}</td>
-            <td>{{ student.age }}</td>
-            <td>{{ student.email }}</td>
-            <td>{{ student.role }}</td>
-        </tr>
-            {% endif %}
-        {% endfor %}
+        <div id="allTable" class="table-container" style="display:none;">
 
-    </table>
+            <table >
+
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Course</th>
+                    <th>Branch</th>
+                    <th>City</th>
+                    <th>Semester</th>
+                    <th>Status</th>
+                    <th>Role</th>
+                </tr>
+
+                {% for student in students %}
+                    {% if student.role == "Student" %}
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.password }}</td>
+                        <td>{{ student.course }}</td>
+                        <td>{{ student.branch }}</td>
+                        <td>{{ student.city }}</td>
+                        <td>{{ student.semester }}</td>
+                        <td>{{ student.status }}</td>
+                        <td>{{ student.role }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        <div id="someTable" class="table-container" style="display:none;">
+
+            <table >
+
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Branch</th>
+                    <th>Semester</th>
+                </tr>
+
+                {% for student in students %}
+                    {% if student.role == "Student" %}
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.branch }}</td>
+                        <td>{{ student.semester }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+
+            </table>
+
+        </div>
+
     </div>
 
+    <hr>
 
-    <div>
+    <!-- ===================== DELETE SECTION ===================== -->
+
+    <div id="delete">
+
         <h2>Deletion</h2>
+
         <hr>
-        <!-- <a href="/delete-page">
-            <button>Delete Students</button>
-        </a> -->
+
         <h2>Delete All Students</h2>
-        
-        {% if message %}
-        <p style="color:red;">{{ message }}</p>
-        {% endif %}
+            {% if message_delete_all %}
+                <p class="error">
+                    {{ message_delete_all }}
+                </p>
+            {% endif %}
         <form action="/delete-all" method="post">
-            <input type="text" name="confirm"placeholder="Type DELETE to confirm:"">
-            <button type="submit">Delete All Students</button>
+
+            <input
+                type="text"
+                name="confirm"
+                placeholder="Type DELETE to confirm:"
+            >
+
+            <button type="submit">
+                Delete All Students
+            </button>
+
         </form>
 
         <hr>
 
         <h2>Delete Selected Students</h2>
 
+        {% if message_delete_some %}
+            <p class="error">
+                {{ message_delete_some }}
+            </p>
+        {% endif %}
+
         <form action="/delete-some" method="post">
 
-        {% for student in students %}
-            {%if student.role=="Student"%}
-            <input
-                type="checkbox"
-                name="emails"
-                value="{{ student.email }}"
-            >
-            <label>{{ student.email }}</label>
+            {% for student in students %}
+                {% if student.role == "Student" %}
+
+                <div class="checkbox-item">
+
+                    <input
+                        type="checkbox"
+                        name="emails"
+                        value="{{ student.email }}"
+                    >
+
+                    <label>{{ student.email }}</label>
+
+                </div>
+
+                <br>
+
+                {% endif %}
+            {% endfor %}
+
             <br>
-            {% endif %}
-        {% endfor %}
 
-        <br>
-
-        <button type="submit">
-            Delete Selected
-        </button>
+            <button type="submit">
+                Delete Selected
+            </button>
 
         </form>
-    </div>
-</div>
-<script>
-function showStudents() {
-    let table = document.getElementById("read");
-    let btn = document.getElementById("showBtn");
 
-    if (table.style.display === "none") {
-        table.style.display = "block";
-        btn.innerText = "Hide Students";
+    </div>
+
+    <hr>
+
+    <!-- ===================== UPDATE SECTION ===================== -->
+
+    <div id="update">
+
+        <h2>Updation</h2>
+
+        <hr>
+
+        <!-- ---------- Update All ---------- -->
+
+        <h2>Update All Students</h2>
+
+        <hr>
+
+        <form action="/update-all" method="post">
+
+            <label>Select Field:</label>
+
+            <select name="field" required>
+
+                <option value="">--Select Field--</option>
+                <option value="course">Course</option>
+                <option value="branch">Branch</option>
+                <option value="semester">Semester</option>
+                <option value="city">City</option>
+                <option value="status">Status</option>
+
+            </select>
+
+            <label>New Value:</label>
+
+            <input
+                type="text"
+                name="value"
+                required
+            >
+
+            <button type="submit">
+                Update All
+            </button>
+
+        </form>
+
+        {% if message_update %}
+
+            <p class="success">
+                {{ message_update_all }}
+            </p>
+
+            <p>
+                Matched: {{ matched_all }}<br>
+                Modified: {{ modified_all }}
+            </p>
+
+        {% endif %}
+
+        <!-- ---------- Update Selected ---------- -->
+
+        <h2>Update Selected Students</h2>
+
+        <form action="/update-some" method="post">
+
+            <label>Select Students:</label>
+
+            {% for student in students %}
+                {% if student.role == "Student" %}
+
+                    <input
+                        type="checkbox"
+                        name="emails"
+                        value="{{ student.email }}"
+                    >
+
+                    <label>{{ student.email }}</label>
+
+                    <br>
+
+                {% endif %}
+            {% endfor %}
+
+            <br>
+
+            <label>Select Field:</label>
+
+            <select name="field" required>
+
+                <option value="">--Select Field--</option>
+                <option value="course">Course</option>
+                <option value="branch">Branch</option>
+                <option value="semester">Semester</option>
+                <option value="city">City</option>
+                <option value="status">Status</option>
+
+            </select>
+
+            <label>New Value:</label>
+
+            <input
+                type="text"
+                name="value"
+                required
+            >
+
+            <button type="submit">
+                Update Selected Students
+            </button>
+
+        </form>
+
+        {% if message_update_some %}
+
+            <p class="success">
+                {{ message_update_some }}
+            </p>
+
+            <p>
+                Matched: {{ matched_some }}<br>
+                Modified: {{ modified_some }}
+            </p>
+
+        {% endif %}
+
+        <div id="update-one"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+function showAllDetails() {
+
+    let allTable = document.getElementById("allTable");
+    let someTable = document.getElementById("someTable");
+
+    if (allTable.style.display === "none") {
+        allTable.style.display = "block";
+        someTable.style.display = "none";
     } else {
-        table.style.display = "none";
-        btn.innerText = "Show Students";
+        allTable.style.display = "none";
     }
 }
+
+function showSomeDetails() {
+
+    let allTable = document.getElementById("allTable");
+    let someTable = document.getElementById("someTable");
+
+    if (someTable.style.display === "none") {
+        someTable.style.display = "block";
+        allTable.style.display = "none";
+    } else {
+        someTable.style.display = "none";
+    }
+}
+
 </script>
+
 </body>
 </html>
+
+
+
